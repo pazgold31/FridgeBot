@@ -12,6 +12,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
+    scripts=['FridgeBot/Utils/update.sh'],
     install_requires=["python-telegram-bot >= 13"],
     classifiers=[
         "Programming Language :: Python :: 3",
