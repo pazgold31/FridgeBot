@@ -1,3 +1,5 @@
+import logging
+
 import serial
 import struct
 
@@ -6,6 +8,7 @@ from enum import Enum
 START_MAGIC = 0xabcd
 SUCCESS_MESSAGE = b"\xab\xcd\x02"
 ERROR_MESSAGE = b"\xab\xcd\x01"
+
 
 class PinMode(Enum):
     Digital = 1
@@ -23,6 +26,21 @@ class ArduinoCommunicator:
         self._arduino.flushInput()
         self._arduino.flushOutput()
 
+    def _validate_request_successful(self) -> None:
+        received_message = self.read(len(SUCCESS_MESSAGE))
+        if SUCCESS_MESSAGE != received_message:
+            if received_message == ERROR_MESSAGE:
+                logging.error("Received an error from arduino")
+            else:
+                logging.error("Arduino returned an invalid message")
+
+            raise RuntimeError
+
+    def _get_read_result(self) -> int:
+        self._validate_request_successful()
+        returned_value = self.read()
+        return ord(returned_value)
+
     def send(self, data: bytes) -> None:
         self._arduino.write(data)
 
@@ -33,7 +51,22 @@ class ArduinoCommunicator:
         packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Digital.value, RequestType.Set.value,
                              1 if status else 0)
         self.send(data=packet)
-        print(self.read(3))
+        self._validate_request_successful()
+
+    def digital_read(self, pin: int) -> bool:
+        packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Digital.value, RequestType.Read.value)
+        self.send(data=packet)
+        return True if self._get_read_result() else False
+
+    def analog_set(self, pin: int, status: int) -> None:
+        packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Analog.value, RequestType.Set.value, status)
+        self.send(data=packet)
+        self._validate_request_successful()
+
+    def analog_read(self, pin: int) -> int:
+        packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Analog.value, RequestType.Read.value)
+        self.send(data=packet)
+        return self._get_read_result()
 
     def close(self):
         self._arduino.close()

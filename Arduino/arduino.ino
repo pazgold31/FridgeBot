@@ -128,7 +128,7 @@ void handle_read_command() {
       send_error_message();
       break;
   }
-  char reply[] = {MAGIC_BYTE1, MAGIC_BYTE2, 0, value};
+  char reply[] = {MAGIC_BYTE1, MAGIC_BYTE2, 2, value};
   Serial.write(reply);
 }
 
