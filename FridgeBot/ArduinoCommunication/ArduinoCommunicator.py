@@ -42,6 +42,7 @@ class ArduinoCommunicator:
         return ord(returned_value)
 
     def send(self, data: bytes) -> None:
+
         self._arduino.write(data)
 
     def read(self, amount_of_bytes: int = 1) -> bytes:
