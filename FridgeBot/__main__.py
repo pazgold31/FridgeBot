@@ -1,4 +1,4 @@
-from .fridge_bot import main as fridgebot_main
+from FridgeBot.Bot.fridge_bot import main as fridgebot_main
 
 
 def main():
