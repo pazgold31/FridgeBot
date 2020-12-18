@@ -1,3 +1,5 @@
+import logging
+
 from FridgeBot.ArduinoCommunication.ArduinoCommunicator import ArduinoCommunicator
 
 
@@ -7,4 +9,5 @@ class TemperatureSensor:
         self._pin = pin
 
     def get(self) -> int:
+        logging.debug("Checking Temperature on pin {}".format(self._pin))
         return self._arduino.analog_read(self._pin)

@@ -1,3 +1,5 @@
+import logging
+
 from FridgeBot.ArduinoCommunication.ArduinoCommunicator import ArduinoCommunicator
 
 
@@ -8,4 +10,5 @@ class MicroSwitch:
         self._nc = nc
 
     def is_clicked(self) -> bool:
+        logging.debug("Checking if microswitch is clicked on pin {}".format(self._pin))
         return self._arduino.digital_read(self._pin)

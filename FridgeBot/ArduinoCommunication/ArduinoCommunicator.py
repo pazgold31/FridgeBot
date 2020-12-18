@@ -6,8 +6,8 @@ import struct
 from enum import Enum
 
 START_MAGIC = 0xabcd
-SUCCESS_MESSAGE = b"\xab\xcd\x02"
-ERROR_MESSAGE = b"\xab\xcd\x01"
+SUCCESS_MESSAGE = b"\xab\xcd\x01"
+ERROR_MESSAGE = b"\xab\xcd"
 
 
 class PinMode(Enum):
@@ -29,8 +29,9 @@ class ArduinoCommunicator:
     def _validate_request_successful(self) -> None:
         received_message = self.read(len(SUCCESS_MESSAGE))
         if SUCCESS_MESSAGE != received_message:
-            if received_message == ERROR_MESSAGE:
-                logging.error("Received an error from arduino")
+            if received_message[:len(ERROR_MESSAGE)] == ERROR_MESSAGE:
+                error_code = received_message[-1]
+                logging.error("Received an error from arduino, error code: {code}", code=error_code)
             else:
                 logging.error("Arduino returned an invalid message")
 

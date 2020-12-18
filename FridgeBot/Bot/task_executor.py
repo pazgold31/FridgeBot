@@ -8,5 +8,6 @@ def execute_forever():
         for task in Tasks:
             if task.can_run():
                 task.run()
+                Tasks.execute(task)
 
         time.sleep(0.5)

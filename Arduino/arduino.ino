@@ -25,16 +25,16 @@ const unsigned int REQUEST_TYPE_READ  = 2;
 const unsigned char MAGIC_BYTE1 = 0xab;
 const unsigned char MAGIC_BYTE2 = 0xcd;
 
-const char ERROR_MESSAGE[] = {MAGIC_BYTE1, MAGIC_BYTE2, 1};
-const char SUCCESS_MESSAGE[] = {MAGIC_BYTE1, MAGIC_BYTE2, 3};
+const char SUCCESS_MESSAGE[] = {MAGIC_BYTE1, MAGIC_BYTE2, 1};
+const char ERROR_MESSAGE[] = {MAGIC_BYTE1, MAGIC_BYTE2};
 
 const unsigned int MESSAGE_SIZE = 6;
 char message[MESSAGE_SIZE];
 
 const int DIGITAL_INPUT_PINS[] = {};
 const int DIGITAL_OUTPUT_PINS[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}; // 3, 8, 9, 11, 12, 13 are used by motors
-const int ANALOG_INPUT_PINS[] = {0, 1, 2, 3, 4, 5, 6, 7};
-const int ANALOG_OUTPUT_PINS[] = {};
+const int ANALOG_INPUT_PINS[] = {0, 1, 2, 4, 5, 6, 7};
+const int ANALOG_OUTPUT_PINS[] = {3, 11};
 
 void setup() {
   Serial.begin(9600);              //Starting serial communication
@@ -71,8 +71,9 @@ void update_buffer(int recevied_byte) {
   message[MESSAGE_SIZE - 1] = recevied_byte;
 }
 
-void send_error_message() {
+void send_error_message(const char error_code) {
   Serial.write(ERROR_MESSAGE, sizeof(ERROR_MESSAGE));
+  Serial.write(error_code);
 }
 
 void send_success_message() {
@@ -85,20 +86,20 @@ void handle_set_command() {
   switch (message[MODE_OFFSET]) {
     case PIN_MODE_DI:
       if (!is_in_array(pin, DIGITAL_OUTPUT_PINS, sizeof(DIGITAL_OUTPUT_PINS))) {
-        send_error_message();
+        send_error_message(2);
         return;
       }
       digitalWrite(pin, message[VALUE_OFFSET]);
       break;
     case PIN_MODE_AN:
       if (!is_in_array(pin, ANALOG_OUTPUT_PINS, sizeof(ANALOG_OUTPUT_PINS))) {
-        send_error_message();
+        send_error_message(3);
         return;
       }
       analogWrite(pin, message[VALUE_OFFSET]);
       break;
     default:
-      send_error_message();
+      send_error_message(4);
       return;
   }
   send_success_message();
@@ -112,20 +113,20 @@ void handle_read_command() {
   switch (message[MODE_OFFSET]) {
     case PIN_MODE_DI:
       if (!is_in_array(pin, DIGITAL_INPUT_PINS, sizeof(DIGITAL_INPUT_PINS))) {
-        send_error_message();
+        send_error_message(5);
         return;
       }
       value = digitalRead(pin);
       break;
     case PIN_MODE_AN:
       if (!is_in_array(pin, ANALOG_INPUT_PINS, sizeof(ANALOG_INPUT_PINS))) {
-        send_error_message();
+        send_error_message(6);
         return;
       }
       value = analogRead(pin);
       break;
     default:
-      send_error_message();
+      send_error_message(7);
       break;
   }
   char reply[] = {MAGIC_BYTE1, MAGIC_BYTE2, 2, value};
@@ -141,7 +142,7 @@ void handle_command() {
       handle_read_command();
       break;
     default:
-      send_error_message();
+      send_error_message(8);
   }
 }
 
