@@ -1,11 +1,11 @@
 import copy
 from typing import List
 
-from FridgeBot.PiCode.Tasks.FridgeTask import FridgeTask
+from FridgeBot.PiCode.Tasks.IFridgeTask import IFridgeTask
 
 
 class TaskList(list):
-    def __init__(self, lst: List[FridgeTask]):
+    def __init__(self, lst: List[IFridgeTask]):
         self._original_list = copy.copy(lst)
         super(TaskList, self).__init__(lst)
 
@@ -16,7 +16,10 @@ class TaskList(list):
         self[key] = item
 
     def execute(self, item) -> None:
+        item.run()
+
         if item in self._original_list:
-            item.restart()
+            if item.is_finished():
+                item.restart()
         else:
             self.pop(self.index(item))

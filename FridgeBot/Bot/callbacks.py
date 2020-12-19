@@ -28,10 +28,11 @@ class Callbacks:
             temperature = TEMPERATURE_SENSOR.get()
             humidity = HUMIDITY_SENSOR.get()
             update.message.reply_text(
-                'The current temperature is {temperature:.2f} and humidity is {humidity:.1f}%'.format(
+                'The current temperature is {temperature:.2f}C and humidity is {humidity:.1f}%'.format(
                     temperature=temperature, humidity=humidity))
         except Exception:
             logging.exception("Received exception in status callback")
+            update.message.reply_text("Failed to receive the temperature")
 
     @staticmethod
     def error(update, context):

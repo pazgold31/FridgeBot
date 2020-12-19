@@ -8,5 +8,5 @@ class TemperatureSensor:
         self._arduino = arduino
 
     def get(self) -> float:
-        logging.debug("Checking Temperature")
+        logging.info("Checking Temperature")
         return self._arduino.get_temperature()

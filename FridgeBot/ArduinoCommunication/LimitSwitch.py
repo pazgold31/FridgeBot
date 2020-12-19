@@ -8,8 +8,10 @@ class LimitSwitch:
         self._arduino = arduino
         self._pin = pin
         self._nc = nc
-        self._arduino.digital_set(pin-pin, status=True)
+        self._arduino.digital_set(pin=pin, status=True)
 
     def is_clicked(self) -> bool:
-        logging.debug("Checking if microswitch is clicked on pin {}".format(self._pin))
-        return self._arduino.digital_read(self._pin)
+        logging.info("Checking if Limit switch is clicked on pin {}".format(self._pin))
+        res = self._arduino.digital_read(self._pin)
+        logging.info("Micro switch is: {}".format(res))
+        return res

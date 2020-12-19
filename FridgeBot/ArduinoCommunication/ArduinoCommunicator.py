@@ -1,4 +1,5 @@
 import logging
+import time
 from threading import Lock
 
 import serial
@@ -28,6 +29,7 @@ class ArduinoCommunicator:
         self._arduino = serial.Serial(serial_port, baudrate=9600, timeout=5)
         self._arduino.flushInput()
         self._arduino.flushOutput()
+        time.sleep(2)  # Giving arduino some time to initialize.
         self._lock = Lock()
 
     def _validate_request_successful(self) -> None:
@@ -35,7 +37,7 @@ class ArduinoCommunicator:
         if SUCCESS_MESSAGE != received_message:
             if received_message[:len(ERROR_MESSAGE)] == ERROR_MESSAGE:
                 error_code = received_message[-1]
-                logging.error("Received an error from arduino, error code: {code}", code=error_code)
+                logging.error("Received an error from arduino, error code: {code}".format(code=error_code))
             else:
                 logging.error("Arduino returned an invalid message")
 

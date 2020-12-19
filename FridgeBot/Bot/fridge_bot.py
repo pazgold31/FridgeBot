@@ -8,7 +8,7 @@ from FridgeBot.Bot.task_executor import execute_forever
 
 BOT_TOKEN = "1484702411:AAHvOA7AI1_L8ZBHkPLGkfbbpHHeipnVnEw"
 
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG,
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO,
                     handlers=[logging.FileHandler("/tmp/fridgelog"), logging.StreamHandler()])
 
 

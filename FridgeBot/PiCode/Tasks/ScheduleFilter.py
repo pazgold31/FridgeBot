@@ -4,9 +4,8 @@ from FridgeBot.PiCode.Tasks.IIFilter import IFilter
 
 
 class ScheduleFilter(IFilter):
-    def __init__(self, time_offset: int, restart_cooldown: int = 0):
+    def __init__(self, time_offset: int):
         self._time_offset = time_offset
-        self._restart_cooldown = restart_cooldown
         self._target_time = time.time() + time_offset
 
     def filter(self) -> bool:
@@ -17,4 +16,4 @@ class ScheduleFilter(IFilter):
         return False
 
     def restart(self) -> None:
-        self._target_time = time.time() + self._time_offset + self._restart_cooldown
+        self._target_time = time.time() + self._time_offset

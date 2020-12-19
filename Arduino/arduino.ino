@@ -36,8 +36,8 @@ const char ERROR_MESSAGE[] = {MAGIC_BYTE1, MAGIC_BYTE2};
 const unsigned int MESSAGE_SIZE = 6;
 char message[MESSAGE_SIZE];
 
-const int DIGITAL_INPUT_PINS[] = {};
-const int DIGITAL_OUTPUT_PINS[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}; // 3, 8, 9, 11, 12, 13 are used by motors
+const int DIGITAL_INPUT_PINS[] = {2};
+const int DIGITAL_OUTPUT_PINS[] = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}; // 3, 8, 9, 11, 12, 13 are used by motors
 const int ANALOG_INPUT_PINS[] = {0, 1, 2, 6, 7}; // 4,5 Are use by temp and humidity sensor and it need to be used specificly
 const int ANALOG_OUTPUT_PINS[] = {3, 11};
 
@@ -59,12 +59,12 @@ void setup() {
   
   for (int i = 0; i < sizeof(DIGITAL_OUTPUT_PINS); i++) {
     pinMode(i, OUTPUT); 
-    digitalWrite(i, LOW); 
   }
   for (int i = 0; i < sizeof(ANALOG_OUTPUT_PINS); i++) {
     pinMode(i, OUTPUT); 
   }
 
+  digitalWrite(2, HIGH);
   am2320.begin();
 }
 
@@ -99,17 +99,17 @@ void handle_set_command() {
   
   switch (message[MODE_OFFSET]) {
     case PIN_MODE_DI:
-      if (!is_in_array(pin, DIGITAL_OUTPUT_PINS, sizeof(DIGITAL_OUTPUT_PINS))) {
-        send_error_message(2);
-        return;
-      }
+      //if (!is_in_array(pin, DIGITAL_OUTPUT_PINS, sizeof(DIGITAL_OUTPUT_PINS))) {
+      //  send_error_message(2);
+      //  return;
+      //}
       digitalWrite(pin, message[VALUE_OFFSET]);
       break;
     case PIN_MODE_AN:
-      if (!is_in_array(pin, ANALOG_OUTPUT_PINS, sizeof(ANALOG_OUTPUT_PINS))) {
-        send_error_message(3);
-        return;
-      }
+      //if (!is_in_array(pin, ANALOG_OUTPUT_PINS, sizeof(ANALOG_OUTPUT_PINS))) {
+      //  send_error_message(3);
+      //  return;
+      //}
       analogWrite(pin, message[VALUE_OFFSET]);
       break;
     default:
@@ -126,25 +126,25 @@ void handle_read_command() {
   unsigned char value = 0;
   switch (message[MODE_OFFSET]) {
     case PIN_MODE_DI:
-      if (!is_in_array(pin, DIGITAL_INPUT_PINS, sizeof(DIGITAL_INPUT_PINS))) {
-        send_error_message(5);
-        return;
-      }
+      //if (!is_in_array(pin, DIGITAL_INPUT_PINS, sizeof(DIGITAL_INPUT_PINS))) {
+      //  send_error_message(5);
+      //  return;
+     // }
       value = digitalRead(pin);
       break;
     case PIN_MODE_AN:
-      if (!is_in_array(pin, ANALOG_INPUT_PINS, sizeof(ANALOG_INPUT_PINS))) {
-        send_error_message(6);
-        return;
-      }
+      //if (!is_in_array(pin, ANALOG_INPUT_PINS, sizeof(ANALOG_INPUT_PINS))) {
+      //  send_error_message(6);
+      //  return;
+      //}
       value = analogRead(pin);
       break;
     default:
       send_error_message(7);
       break;
   }
-  char reply[] = {MAGIC_BYTE1, MAGIC_BYTE2, 2, value};
-  Serial.write(reply);
+  send_success_message();
+  Serial.write(value);
 }
 
 void handle_get_temperature_command() {
@@ -156,7 +156,7 @@ void handle_get_temperature_command() {
       }
     }
     if (isnan(temp)) {
-      send_error_message(7); 
+      send_error_message(9); 
       return;
     }
     send_success_message();
@@ -172,7 +172,7 @@ void handle_get_humidity_command() {
       }
     }
     if (isnan(humidity)) {
-      send_error_message(8); 
+      send_error_message(10); 
       return;
     }
     send_success_message();
