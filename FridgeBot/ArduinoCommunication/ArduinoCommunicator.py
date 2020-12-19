@@ -1,4 +1,5 @@
 import logging
+from threading import Lock
 
 import serial
 import struct
@@ -18,6 +19,8 @@ class PinMode(Enum):
 class RequestType(Enum):
     Set = 1
     Read = 2
+    GetTemperature = 3
+    GetHumidity = 4
 
 
 class ArduinoCommunicator:
@@ -25,9 +28,10 @@ class ArduinoCommunicator:
         self._arduino = serial.Serial(serial_port, baudrate=9600, timeout=5)
         self._arduino.flushInput()
         self._arduino.flushOutput()
+        self._lock = Lock()
 
     def _validate_request_successful(self) -> None:
-        received_message = self.read(len(SUCCESS_MESSAGE))
+        received_message = self._read(len(SUCCESS_MESSAGE))
         if SUCCESS_MESSAGE != received_message:
             if received_message[:len(ERROR_MESSAGE)] == ERROR_MESSAGE:
                 error_code = received_message[-1]
@@ -39,36 +43,64 @@ class ArduinoCommunicator:
 
     def _get_read_result(self) -> int:
         self._validate_request_successful()
-        returned_value = self.read()
+        returned_value = self._read()
         return ord(returned_value)
 
-    def send(self, data: bytes) -> None:
-
+    def _send(self, data: bytes) -> None:
         self._arduino.write(data)
 
-    def read(self, amount_of_bytes: int = 1) -> bytes:
+    def send(self, data: bytes) -> None:
+        with self._lock:
+            self._send(data=data)
+
+    def _read(self, amount_of_bytes: int = 1) -> bytes:
         return self._arduino.read(amount_of_bytes)
 
+    def read(self, amount_of_bytes: int = 1) -> bytes:
+        with self._lock:
+            return self._read(amount_of_bytes=amount_of_bytes)
+
     def digital_set(self, pin: int, status: bool) -> None:
-        packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Digital.value, RequestType.Set.value,
-                             1 if status else 0)
-        self.send(data=packet)
-        self._validate_request_successful()
+        with self._lock:
+            packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Digital.value, RequestType.Set.value,
+                                 1 if status else 0)
+            self._send(data=packet)
+            self._validate_request_successful()
 
     def digital_read(self, pin: int) -> bool:
-        packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Digital.value, RequestType.Read.value)
-        self.send(data=packet)
-        return True if self._get_read_result() else False
+        with self._lock:
+            packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Digital.value, RequestType.Read.value, 0)
+            self._send(data=packet)
+            return True if self._get_read_result() else False
 
     def analog_set(self, pin: int, status: int) -> None:
-        packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Analog.value, RequestType.Set.value, status)
-        self.send(data=packet)
-        self._validate_request_successful()
+        with self._lock:
+            packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Analog.value, RequestType.Set.value, status)
+            self._send(data=packet)
+            self._validate_request_successful()
 
     def analog_read(self, pin: int) -> int:
-        packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Analog.value, RequestType.Read.value)
-        self.send(data=packet)
-        return self._get_read_result()
+        with self._lock:
+            packet = struct.pack(">HBBBB", START_MAGIC, pin, PinMode.Analog.value, RequestType.Read.value, 0)
+            self._send(data=packet)
+            return self._get_read_result()
+
+    def get_temperature(self) -> float:
+        with self._lock:
+            packet = struct.pack(">HBBBB", START_MAGIC, 0, 0, RequestType.GetTemperature.value, 0)
+            self._send(data=packet)
+            self._validate_request_successful()
+            arg = self._read(4)
+            return struct.unpack("f", arg)[0]
+
+    def get_humidity(self) -> float:
+        with self._lock:
+            packet = struct.pack(">HBBBB", START_MAGIC, 0, 0, RequestType.GetHumidity.value, 0)
+            self._send(data=packet)
+            self._validate_request_successful()
+            arg = self._read(4)
+            return struct.unpack("f", arg)[0]
 
     def close(self):
-        self._arduino.close()
+        with self._lock:
+            self._arduino.close()

@@ -4,10 +4,9 @@ from FridgeBot.ArduinoCommunication.ArduinoCommunicator import ArduinoCommunicat
 
 
 class TemperatureSensor:
-    def __init__(self, arduino: ArduinoCommunicator, pin: int):
+    def __init__(self, arduino: ArduinoCommunicator):
         self._arduino = arduino
-        self._pin = pin
 
-    def get(self) -> int:
-        logging.debug("Checking Temperature on pin {}".format(self._pin))
-        return self._arduino.analog_read(self._pin)
+    def get(self) -> float:
+        logging.debug("Checking Temperature")
+        return self._arduino.get_temperature()

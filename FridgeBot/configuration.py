@@ -15,8 +15,8 @@ Arduino = ArduinoCommunicator("COM5")
 UV_LIGHT_RELAY = Relay(arduino=Arduino, pin=2, nc=True)
 FAN_A = Motor(arduino=Arduino, direction_pin=12, break_pin=9, speed_pin=3)
 FAN_B = Motor(arduino=Arduino, direction_pin=13, break_pin=8, speed_pin=11)
-TEMPERATURE_SENSOR = TemperatureSensor(arduino=Arduino, pin=4)
-HUMIDITY_SENSOR = HumiditySensor(arduino=Arduino, pin=5)
+TEMPERATURE_SENSOR = TemperatureSensor(arduino=Arduino)
+HUMIDITY_SENSOR = HumiditySensor(arduino=Arduino)
 
 UV_ON_TIME = 20
 UV_OFF_TIME = 30

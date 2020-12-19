@@ -1,3 +1,6 @@
+#include "Adafruit_Sensor.h"
+#include "Adafruit_AM2320.h"
+
 // 2 Bytes - Magic (0xabcd)
 // 1 Byte - Pin
 // 1 Byte - Mode (1 - Digital, 2 - Analog)
@@ -21,6 +24,8 @@ const unsigned int PIN_MODE_AN = 2;
 
 const unsigned int REQUEST_TYPE_SET = 1;
 const unsigned int REQUEST_TYPE_READ  = 2;
+const unsigned int REQUEST_TYPE_READ_TEMP  = 3;
+const unsigned int REQUEST_TYPE_READ_HUMIDITY  = 4;
 
 const unsigned char MAGIC_BYTE1 = 0xab;
 const unsigned char MAGIC_BYTE2 = 0xcd;
@@ -33,11 +38,18 @@ char message[MESSAGE_SIZE];
 
 const int DIGITAL_INPUT_PINS[] = {};
 const int DIGITAL_OUTPUT_PINS[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}; // 3, 8, 9, 11, 12, 13 are used by motors
-const int ANALOG_INPUT_PINS[] = {0, 1, 2, 4, 5, 6, 7};
+const int ANALOG_INPUT_PINS[] = {0, 1, 2, 6, 7}; // 4,5 Are use by temp and humidity sensor and it need to be used specificly
 const int ANALOG_OUTPUT_PINS[] = {3, 11};
+
+Adafruit_AM2320 am2320 = Adafruit_AM2320();
 
 void setup() {
   Serial.begin(9600);              //Starting serial communication
+  
+  while (!Serial) {
+    delay(10); // hang out until serial port opens
+  }
+  
   for (int i = 0; i < sizeof(DIGITAL_INPUT_PINS); i++) {
     pinMode(i, INPUT);
   }
@@ -52,6 +64,8 @@ void setup() {
   for (int i = 0; i < sizeof(ANALOG_OUTPUT_PINS); i++) {
     pinMode(i, OUTPUT); 
   }
+
+  am2320.begin();
 }
 
 bool is_in_array(int value, int arr[], unsigned int arr_size) 
@@ -133,6 +147,38 @@ void handle_read_command() {
   Serial.write(reply);
 }
 
+void handle_get_temperature_command() {
+    float temp;
+    for(int i = 0; i< 3; i++) {
+      temp = am2320.readTemperature();
+      if (!isnan(temp)) {
+        break;
+      }
+    }
+    if (isnan(temp)) {
+      send_error_message(7); 
+      return;
+    }
+    send_success_message();
+    Serial.write((char*)&temp, 4);
+}
+
+void handle_get_humidity_command() {
+    float humidity;
+    for(int i = 0; i< 3; i++) {
+      humidity = am2320.readHumidity(); 
+      if (!isnan(humidity)) {
+        break;
+      }
+    }
+    if (isnan(humidity)) {
+      send_error_message(8); 
+      return;
+    }
+    send_success_message();
+    Serial.write((char*)&humidity, 4);
+}
+
 void handle_command() {
   switch (message[REQUEST_OFFSET]) {
     case REQUEST_TYPE_SET:
@@ -140,6 +186,12 @@ void handle_command() {
       break;
     case REQUEST_TYPE_READ:
       handle_read_command();
+      break;
+    case REQUEST_TYPE_READ_TEMP:
+      handle_get_temperature_command();
+      break;
+    case REQUEST_TYPE_READ_HUMIDITY:
+      handle_get_humidity_command();
       break;
     default:
       send_error_message(8);
