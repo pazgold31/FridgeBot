@@ -15,19 +15,19 @@ class Motor:
         self._inverted = inverted
 
     def forward(self, speed: int):
-        logging.info(
+        logging.debug(
             "Driving motor forward on pins {} {} {}".format(self._direction_pin, self._break_pin, self._speed_pin))
         self._arduino.digital_set(self._direction_pin, not self._inverted)
         self._arduino.digital_set(self._break_pin, False)
         self._arduino.analog_set(self._speed_pin, speed)
 
     def backward(self, speed: int):
-        logging.info(
+        logging.debug(
             "Driving motor backward on pins {} {} {}".format(self._direction_pin, self._break_pin, self._speed_pin))
         self._arduino.digital_set(self._direction_pin, self._inverted)
         self._arduino.digital_set(self._break_pin, False)
         self._arduino.analog_set(self._speed_pin, speed)
 
     def stop(self):
-        logging.info("stopping motor on pins {} {} {}".format(self._direction_pin, self._break_pin, self._speed_pin))
+        logging.debug("stopping motor on pins {} {} {}".format(self._direction_pin, self._break_pin, self._speed_pin))
         self._arduino.digital_set(self._break_pin, True)

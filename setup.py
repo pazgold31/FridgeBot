@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="FridgeBot",
-    version="0.0.5",
+    version="0.1.0",
     author="Paz",
     author_email="paz@fridgebots.com",
     description="A Fridge bot",
@@ -14,6 +14,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     scripts=['FridgeBot/Utils/update.sh'],
     install_requires=["python-telegram-bot >= 13"],
+    package_data={'': ['FridgeBot/Bot/keys.json',]},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

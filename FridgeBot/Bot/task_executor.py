@@ -1,3 +1,4 @@
+import logging
 import time
 
 from FridgeBot.configuration import Tasks
@@ -6,7 +7,10 @@ from FridgeBot.configuration import Tasks
 def execute_forever():
     while True:
         for task in Tasks:
-            if task.can_run():
-                Tasks.execute(task)
+            try:
+                if task.can_run():
+                    Tasks.execute(task)
+            except Exception:
+                logging.exception("Task Failed with exception")
 
         time.sleep(0.5)

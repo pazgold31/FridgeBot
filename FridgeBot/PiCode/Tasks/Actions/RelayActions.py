@@ -1,5 +1,5 @@
 from FridgeBot.ArduinoCommunication.Relay import Relay
-from FridgeBot.PiCode.Tasks.IAction import IAction
+from FridgeBot.PiCode.Tasks.Actions.IAction import IAction
 
 
 class ActivateRelayAction(IAction):

@@ -1,5 +1,5 @@
 from FridgeBot.ArduinoCommunication.Motor import Motor
-from FridgeBot.PiCode.Tasks.IAction import IAction
+from FridgeBot.PiCode.Tasks.Actions.IAction import IAction
 
 
 class ActivateFansAction(IAction):

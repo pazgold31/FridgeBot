@@ -1,5 +1,5 @@
 from FridgeBot.ArduinoCommunication.LimitSwitch import LimitSwitch
-from FridgeBot.PiCode.Tasks.IIFilter import IFilter
+from FridgeBot.PiCode.Tasks.Filters.IIFilter import IFilter
 
 
 class FridgeOpenFilter(IFilter):

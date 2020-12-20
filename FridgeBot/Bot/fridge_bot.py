@@ -1,9 +1,11 @@
 import logging
 import threading
+import telegram
 
 from telegram.ext import Updater
 
 from FridgeBot.Bot.callbacks import Callbacks
+from FridgeBot.Bot.globals import BotWrapper
 from FridgeBot.Bot.task_executor import execute_forever
 
 BOT_TOKEN = "1484702411:AAHvOA7AI1_L8ZBHkPLGkfbbpHHeipnVnEw"
@@ -16,8 +18,9 @@ def main():
     """
     Start the bot.
     """
-    updater = Updater(BOT_TOKEN, use_context=True)
 
+    updater = Updater(BOT_TOKEN, use_context=True)
+    BotWrapper().set_bot(bot=updater.bot)
     dispatcher = updater.dispatcher
     Callbacks.initialize_handlers(dispatcher=dispatcher)
 

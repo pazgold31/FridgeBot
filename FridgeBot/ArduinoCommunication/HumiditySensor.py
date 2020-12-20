@@ -8,5 +8,5 @@ class HumiditySensor:
         self._arduino = arduino
 
     def get(self) -> float:
-        logging.info("Checking humidity")
+        logging.debug("Checking humidity")
         return self._arduino.get_humidity()

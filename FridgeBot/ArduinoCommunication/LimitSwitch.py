@@ -11,7 +11,7 @@ class LimitSwitch:
         self._arduino.digital_set(pin=pin, status=True)
 
     def is_clicked(self) -> bool:
-        logging.info("Checking if Limit switch is clicked on pin {}".format(self._pin))
+        logging.debug("Checking if Limit switch is clicked on pin {}".format(self._pin))
         res = self._arduino.digital_read(self._pin)
-        logging.info("Micro switch is: {}".format(res))
+        logging.debug("Micro switch is: {}".format(res))
         return res

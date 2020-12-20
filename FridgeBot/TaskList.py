@@ -1,7 +1,7 @@
 import copy
 from typing import List
 
-from FridgeBot.PiCode.Tasks.IFridgeTask import IFridgeTask
+from FridgeBot.PiCode.Tasks.Tasks.IFridgeTask import IFridgeTask
 
 
 class TaskList(list):

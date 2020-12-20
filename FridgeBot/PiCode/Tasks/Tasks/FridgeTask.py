@@ -1,8 +1,8 @@
 from typing import List
 
-from FridgeBot.PiCode.Tasks.IAction import IAction
-from FridgeBot.PiCode.Tasks.IFridgeTask import IFridgeTask
-from FridgeBot.PiCode.Tasks.IIFilter import IFilter
+from FridgeBot.PiCode.Tasks.Actions.IAction import IAction
+from FridgeBot.PiCode.Tasks.Tasks.IFridgeTask import IFridgeTask
+from FridgeBot.PiCode.Tasks.Filters.IIFilter import IFilter
 
 
 class FridgeTask(IFridgeTask):

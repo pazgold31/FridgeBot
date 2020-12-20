@@ -1,6 +1,6 @@
 import time
 
-from FridgeBot.PiCode.Tasks.IIFilter import IFilter
+from FridgeBot.PiCode.Tasks.Filters.IIFilter import IFilter
 
 
 class ScheduleFilter(IFilter):

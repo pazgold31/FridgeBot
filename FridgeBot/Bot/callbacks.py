@@ -25,7 +25,7 @@ class Callbacks:
             parsed_json.append(chat_key)
 
             with open(KEYS_FILE_PATH, "wt") as fh:
-                json.dump(fh, parsed_json)
+                json.dump(parsed_json, fh)
 
         update.message.reply_text('FridgeBot at your service!')
 
