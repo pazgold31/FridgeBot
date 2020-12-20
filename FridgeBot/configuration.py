@@ -1,3 +1,5 @@
+import os
+
 from FridgeBot.ArduinoCommunication.LimitSwitch import LimitSwitch
 from FridgeBot.ArduinoCommunication.ArduinoCommunicator import ArduinoCommunicator
 from FridgeBot.ArduinoCommunication.HumiditySensor import HumiditySensor
@@ -12,7 +14,10 @@ from FridgeBot.PiCode.Tasks.FridgeTask import FridgeTask
 from FridgeBot.PiCode.Tasks.ScheduleFilter import ScheduleFilter
 from FridgeBot.TaskList import TaskList
 
+KEYS_FILE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "Bot", "keys.json")
+
 Arduino = ArduinoCommunicator("/dev/ttyUSB0")
+
 # Arduino = ArduinoCommunicator("COM5")
 
 UV_LIGHT_RELAY = Relay(arduino=Arduino, pin=4, nc=True)
@@ -47,8 +52,6 @@ FANS_TASKS = [
 Tasks = TaskList([
     FridgeTaskList(tasks=UV_LIGHT_TASKS),  # Turn the UV on and off periodically.
     FridgeTaskList(tasks=FANS_TASKS),  # Turn the Fans on and off periodically.
-    FridgeTask(filters=[FridgeOpenFilter(limit_switch=OPENING_SWITCH)],  # Turn the uv off if the fridge is open
-               action=DeactivateRelayAction(relay=UV_LIGHT_RELAY))
-
-
+    # FridgeTask(filters=[FridgeOpenFilter(limit_switch=OPENING_SWITCH)],  # Turn the uv off if the fridge is open
+    #            action=DeactivateRelayAction(relay=UV_LIGHT_RELAY))
 ])
