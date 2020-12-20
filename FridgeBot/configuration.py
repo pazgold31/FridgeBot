@@ -31,11 +31,11 @@ OPENING_SWITCH = LimitSwitch(arduino=Arduino, pin=2)
 TEMPERATURE_SENSOR = TemperatureSensor(arduino=Arduino)
 HUMIDITY_SENSOR = HumiditySensor(arduino=Arduino)
 
-UV_ON_TIME = 20
-UV_OFF_TIME = 30
+UV_ON_TIME = 5 * 60
+UV_OFF_TIME = 1 * 60 * 60
 
-FANS_ON_TIME = 20
-FANS_OFF_TIME = 30
+FANS_ON_TIME = 5 * 60
+FANS_OFF_TIME = 1 * 60 * 60
 
 TEMPERATURE_ALERT = 5
 TEMPERATURE_ALERT_COOLDOWN = 1 * 60 * 60  # In seconds - 1 Hour

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="FridgeBot",
-    version="0.1.0",
+    version="0.1.6",
     author="Paz",
     author_email="paz@fridgebots.com",
     description="A Fridge bot",

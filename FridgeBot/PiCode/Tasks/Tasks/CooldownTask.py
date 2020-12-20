@@ -16,7 +16,6 @@ class CooldownTask(IFridgeTask):
         return self._task.is_finished()
 
     def restart(self) -> None:
-        self._next_available_run_timestamp = time.time()
         self._task.restart()
 
     def run(self) -> None:
