@@ -1,11 +1,12 @@
 import setuptools
+from FridgeBot.version import __version__
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="FridgeBot",
-    version="0.1.10",
+    version=__version__,
     author="Paz",
     author_email="paz@fridgebots.com",
     description="A Fridge bot",

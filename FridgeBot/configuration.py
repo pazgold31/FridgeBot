@@ -15,12 +15,12 @@ from FridgeBot.PiCode.Tasks.Tasks.FridgeTask import FridgeTask
 from FridgeBot.PiCode.Tasks.Filters.ScheduleFilter import ScheduleFilter
 from FridgeBot.PiCode.Tasks.Actions.SendMessageAction import SendMessageAction
 from FridgeBot.PiCode.Tasks.Filters.TemperatureFilter import TemperatureFilter
+from FridgeBot.PiCode.Tasks.Tasks.LinearFilterTask import LinearFilterTask
 from FridgeBot.TaskList import TaskList
 
 KEYS_FILE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "Bot", "keys.json")
 
 Arduino = ArduinoCommunicator("/dev/ttyUSB0")
-
 
 # Arduino = ArduinoCommunicator("COM5")
 
@@ -38,6 +38,7 @@ FANS_ON_TIME = 5 * 60
 FANS_OFF_TIME = 1 * 60 * 60
 
 TEMPERATURE_ALERT = 5
+FRIDGE_OPEN_ALERT = 1 * 60  # If the fridge is open for 1 minute, send message
 TEMPERATURE_ALERT_COOLDOWN = 1 * 60 * 60  # In seconds - 1 Hour
 
 UV_LIGHT_TASKS = [
@@ -65,4 +66,9 @@ Tasks = TaskList([
                                  keys_file_path=KEYS_FILE_PATH))),
     FridgeTask(filters=[FridgeOpenFilter(limit_switch=OPENING_SWITCH)],  # Turn the uv off if the fridge is open
                action=DeactivateRelayAction(relay=UV_LIGHT_RELAY)),
+    LinearFilterTask(filter_time=FRIDGE_OPEN_ALERT,
+                     task=FridgeTask(filters=[FridgeOpenFilter(limit_switch=OPENING_SWITCH)],
+                                     action=SendMessageAction(
+                                         message="The fridge is open for too long!".format(TEMPERATURE_ALERT),
+                                         keys_file_path=KEYS_FILE_PATH)))
 ])

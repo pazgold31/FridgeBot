@@ -3,7 +3,9 @@ import logging
 
 from telegram.ext import Dispatcher, CommandHandler
 
-from FridgeBot.configuration import TEMPERATURE_SENSOR, HUMIDITY_SENSOR, OPENING_SWITCH, KEYS_FILE_PATH
+from FridgeBot.configuration import TEMPERATURE_SENSOR, HUMIDITY_SENSOR, OPENING_SWITCH, KEYS_FILE_PATH, FAN_A, FAN_B, \
+    UV_LIGHT_RELAY
+from FridgeBot.version import __version__
 
 
 class Callbacks:
@@ -13,6 +15,9 @@ class Callbacks:
         dispatcher.add_handler(CommandHandler("help", Callbacks.help))
         dispatcher.add_handler(CommandHandler("status", Callbacks.status))
         dispatcher.add_handler(CommandHandler("door", Callbacks.door))
+        dispatcher.add_handler(CommandHandler("uv", Callbacks.uv))
+        dispatcher.add_handler(CommandHandler("fans", Callbacks.fans))
+        dispatcher.add_handler(CommandHandler("version", Callbacks.version))
         dispatcher.add_error_handler(Callbacks.error)
 
     @staticmethod
@@ -31,8 +36,16 @@ class Callbacks:
 
     @staticmethod
     def help(update, context):
-        # TODO: add actual help
-        update.message.reply_text('/status - presents the status of the fridge')
+        update.message.reply_text('/start - Register to the bot\n'
+                                  '/status - presents the status of the fridge\n'
+                                  '/door - presents the status of the door\n'
+                                  '/fans - control the fans\n'
+                                  '/uv - control the uv light\n'
+                                  '/version - shows the version\n')
+
+    @staticmethod
+    def version(update, context):
+        update.message.reply_text('FridgeBot v{}'.format(__version__))
 
     @staticmethod
     def status(update, context):
@@ -53,6 +66,40 @@ class Callbacks:
         except Exception:
             logging.exception("Received exception in door callback")
             update.message.reply_text("Failed to receive the door status")
+
+    @staticmethod
+    def fans(update, context):
+        try:
+            args = context.args
+            if "on" == args[0].lower():
+                FAN_A.forward(255)
+                FAN_B.forward(255)
+                update.message.reply_text("Turned Fans on")
+            elif "off" == args[0].lower():
+                FAN_A.stop()
+                FAN_B.stop()
+                update.message.reply_text("Turned Fans off")
+            else:
+                update.message.reply_text("Invalid option {}".format(args[0]))
+        except Exception:
+            logging.exception("Received exception in fans callback")
+            update.message.reply_text("Failed to process fans command")
+
+    @staticmethod
+    def uv(update, context):
+        try:
+            args = context.args
+            if "on" == args[0].lower():
+                UV_LIGHT_RELAY.on()
+                update.message.reply_text("Turned UV light on")
+            elif "off" == args[0].lower():
+                UV_LIGHT_RELAY.off()
+                update.message.reply_text("Turned UV light off")
+            else:
+                update.message.reply_text("Invalid option {}".format(args[0]))
+        except Exception:
+            logging.exception("Received exception in uv callback")
+            update.message.reply_text("Failed to process uv command")
 
     @staticmethod
     def error(update, context):
