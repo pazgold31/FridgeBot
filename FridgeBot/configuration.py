@@ -6,7 +6,7 @@ from FridgeBot.ArduinoCommunication.HumiditySensor import HumiditySensor
 from FridgeBot.ArduinoCommunication.Motor import Motor
 from FridgeBot.ArduinoCommunication.Relay import Relay
 from FridgeBot.ArduinoCommunication.TemperatureSensor import TemperatureSensor
-from FridgeBot.PiCode.Tasks.Filters.FridgeOpenFilter import FridgeClosedFilter
+from FridgeBot.PiCode.Tasks.Filters.FridgeOpenFilter import FridgeClosedFilter, FridgeOpenFilter
 from FridgeBot.PiCode.Tasks.Tasks.CooldownTask import CooldownTask
 from FridgeBot.PiCode.Tasks.Tasks.FridgeTaskList import FridgeTaskList
 from FridgeBot.PiCode.Tasks.Actions.FansActions import ActivateFansAction, DeactivateFansAction
@@ -62,7 +62,7 @@ Tasks = TaskList([
     CooldownTask(cooldown=TEMPERATURE_ALERT_COOLDOWN, task=FridgeTask(filters=[
         TemperatureFilter(temperature_sensor=TEMPERATURE_SENSOR, max_temperature=TEMPERATURE_ALERT)],
         action=SendMessageAction(message="Temperature is above {} degrees".format(TEMPERATURE_ALERT),
-                                 keys_file_path=KEYS_FILE_PATH)))
-    # FridgeTask(filters=[FridgeOpenFilter(limit_switch=OPENING_SWITCH)],  # Turn the uv off if the fridge is open
-    #            action=DeactivateRelayAction(relay=UV_LIGHT_RELAY))
+                                 keys_file_path=KEYS_FILE_PATH))),
+    FridgeTask(filters=[FridgeOpenFilter(limit_switch=OPENING_SWITCH)],  # Turn the uv off if the fridge is open
+               action=DeactivateRelayAction(relay=UV_LIGHT_RELAY)),
 ])

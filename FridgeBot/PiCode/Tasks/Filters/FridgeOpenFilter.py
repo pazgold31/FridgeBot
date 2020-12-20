@@ -10,7 +10,7 @@ class FridgeOpenFilter(IFilter):
         """
         Return true if the fridge is open
         """
-        return self._limit_switch.is_clicked()
+        return not self._limit_switch.is_clicked()
 
     def restart(self) -> None:
         pass
@@ -24,7 +24,7 @@ class FridgeClosedFilter(IFilter):
         """
         Return true if the fridge is closed
         """
-        return not self._limit_switch.is_clicked()
+        return self._limit_switch.is_clicked()
 
     def restart(self) -> None:
         pass

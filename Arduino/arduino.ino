@@ -63,8 +63,6 @@ void setup() {
   for (int i = 0; i < sizeof(ANALOG_OUTPUT_PINS); i++) {
     pinMode(i, OUTPUT); 
   }
-
-  digitalWrite(2, HIGH);
   am2320.begin();
 }
 
