@@ -15,6 +15,7 @@ class Callbacks:
         dispatcher.add_handler(CommandHandler("help", Callbacks.help))
         dispatcher.add_handler(CommandHandler("status", Callbacks.status))
         dispatcher.add_handler(CommandHandler("door", Callbacks.door))
+        dispatcher.add_handler(CommandHandler("silent", Callbacks.silent))
         dispatcher.add_handler(CommandHandler("uv", Callbacks.uv))
         dispatcher.add_handler(CommandHandler("fans", Callbacks.fans))
         dispatcher.add_handler(CommandHandler("version", Callbacks.version))
@@ -27,7 +28,7 @@ class Callbacks:
             parsed_json = json.load(fh)
 
         if chat_key not in parsed_json:
-            parsed_json.append(chat_key)
+            parsed_json.append({"chatid": chat_key, "silent": False})  # Default is not silent.
 
             with open(KEYS_FILE_PATH, "wt") as fh:
                 json.dump(parsed_json, fh)
@@ -39,6 +40,7 @@ class Callbacks:
         update.message.reply_text('/start - Register to the bot\n'
                                   '/status - presents the status of the fridge\n'
                                   '/door - presents the status of the door\n'
+                                  '/silent - Enable or disable push notifications\n'
                                   '/fans - control the fans\n'
                                   '/uv - control the uv light\n'
                                   '/version - shows the version\n')
@@ -66,6 +68,35 @@ class Callbacks:
         except Exception:
             logging.exception("Received exception in door callback")
             update.message.reply_text("Failed to receive the door status")
+
+    @staticmethod
+    def silent(update, context):
+        try:
+            args = context.args
+            if "true" == args[0].lower():
+                silent = True
+                update.message.reply_text("You are now in silent mode.")
+            elif "false" == args[0].lower():
+                silent = False
+                update.message.reply_text("Silent mode turned off.")
+            else:
+                update.message.reply_text("Invalid option {}".format(args[0]))
+                raise RuntimeError
+
+            chat_key = update.message.chat.id
+            with open(KEYS_FILE_PATH, "rt") as fh:
+                parsed_json = json.load(fh)
+
+            for client_dict in parsed_json:
+                if chat_key == client_dict["chatid"]:
+                    client_dict["silent"] = silent
+
+            with open(KEYS_FILE_PATH, "wt") as fh:
+                json.dump(parsed_json, fh)
+
+        except Exception:
+            logging.exception("Received exception in silent callback")
+            update.message.reply_text("Failed to process silent command")
 
     @staticmethod
     def fans(update, context):

@@ -17,10 +17,11 @@ class SendMessageAction(IAction):
             raise RuntimeError
 
         with open(self._keys_file_path, "rt") as fh:
-            chat_ids = json.load(fh)
+            parsed_json = json.load(fh)
 
-        for chat_id in chat_ids:
-            BotWrapper().bot.send_message(chat_id=chat_id, text=self._message)
+        for client_dict in parsed_json:
+            if not client_dict["silent"]:
+                BotWrapper().bot.send_message(chat_id=client_dict["chatid"], text=self._message)
 
     def restart(self) -> None:
         pass
