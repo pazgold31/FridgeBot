@@ -1,1 +1,1 @@
-A Fucking bot for a meat Fridge!
+A Telegram bot for my dry-aging smart fridge.
